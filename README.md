@@ -1,0 +1,1 @@
+# pristolik_app
