@@ -6,14 +6,16 @@
     <title>Пристол архангела</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
         :root {
-            --bg-dark: #071f13; /* Глубокий зеленый фон */
-            --bg-card: #0e2e1c; /* Фон карточек */
-            --accent: #baff00; /* Ядовито-салатовый */
+            --bg-dark: #081a11;
+            --bg-card: #0e2b1c;
+            --bg-card-light: #143b26;
+            --accent: #c4ff0d;
             --text-main: #ffffff;
-            --text-muted: #7fa08e;
-            --border-color: rgba(186, 255, 0, 0.15);
-            --danger: #ff4d4d;
+            --text-muted: #7da08c;
+            --border: #1a402d;
             --gold: #ffd700;
         }
 
@@ -21,7 +23,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -29,353 +31,351 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             padding: 15px;
-            padding-bottom: 90px; /* Место под меню */
+            padding-bottom: 90px;
             overflow-x: hidden;
         }
 
-        /* Скрытие вкладок */
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content.active { display: block; }
 
-        /* Карточки в стиле Glass */
+        h1 { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
+        .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
+        .section-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 800; }
+
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Заголовки */
-        .section-title {
-            font-size: 12px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-
-        /* Кнопки */
         .btn {
             width: 100%;
             padding: 14px;
             border: none;
             border-radius: 14px;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-            transition: transform 0.1s;
+            transition: 0.1s;
         }
-        .btn:active { transform: scale(0.97); }
-        .btn-accent { background: var(--accent); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
-        .btn-small { padding: 8px 12px; font-size: 12px; border-radius: 10px; width: auto; }
+        .btn:active { transform: scale(0.96); }
+        .btn-accent { background-color: var(--accent); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
 
-        /* --- ВКЛАДКА ПИТОМЕЦ --- */
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .profile-name { font-size: 22px; font-weight: 800; }
-        .status-badge { background: rgba(186, 255, 0, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+        .action-grid { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .action-grid .btn { flex: 1; min-width: 45%; }
 
-        .mood-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mood { flex: 1; padding: 8px; border-radius: 10px; text-align: center; font-size: 12px; background: rgba(255,255,255,0.05); border: 1px solid transparent; cursor: pointer; }
-        .mood.active { border-color: var(--accent); color: var(--accent); }
-        .mood-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-box { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; }
+        .stat-box .title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
+        .stat-box .value { font-size: 22px; font-weight: 900; }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-
-        .pet-area {
+        /* Профиль (Тамагочи) */
+        .profile-card {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(0,0,0,0.2);
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
+            text-align: center;
+            position: relative;
         }
-        .pet-wrapper { position: relative; width: 140px; height: 140px; margin-bottom: 10px; }
-        .pet-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent); }
-        .accessory { position: absolute; font-size: 35px; z-index: 10; display: none; text-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        
+        .avatar-wrapper {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 15px;
+        }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; }
-        .stat-box .title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .stat-box .value { font-size: 20px; font-weight: 800; }
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 15px rgba(196, 255, 13, 0.2);
+        }
 
-        .bar-container { margin: 10px 0; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .accessory { 
+            position: absolute; 
+            font-size: 40px; 
+            z-index: 10; 
+            display: none; 
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
 
-        /* Магазины */
-        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .shop-tab { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); font-weight: 700; cursor: pointer; }
-        .shop-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .profile-name { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
+        .profile-status { background: rgba(196, 255, 13, 0.1); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px; display: inline-block; }
+
+        .mood-row { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; width: 100%;}
+        .mood-btn { background: var(--bg-card-light); border: 1px solid var(--border); padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; color: var(--text-muted); }
+        .mood-btn.active { border-color: var(--accent); color: var(--text-main); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .bar-container { margin-bottom: 10px; width: 100%; }
+        .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+        .bar-bg { height: 8px; background: #1a402d; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+
+        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-card); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
+        .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 800; font-size: 13px; cursor: pointer; }
+        .shop-tab.active { background: var(--bg-card-light); color: var(--text-main); }
         
         .shop-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
         .shop-grid.active { display: grid; }
-        .shop-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .shop-item .icon { font-size: 28px; margin-bottom: 5px; }
-        .shop-item .name { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; height: 30px; overflow: hidden; }
-        .shop-item .price { font-weight: bold; color: var(--gold); margin-bottom: 8px; font-size: 14px; }
+        .shop-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .shop-item .icon { font-size: 30px; margin-bottom: 5px; }
+        .shop-item .name { font-size: 12px; font-weight: 600; margin-bottom: 5px; height: 30px; overflow: hidden; }
+        .shop-item .price { color: var(--gold); font-weight: 900; margin-bottom: 10px; font-size: 14px; }
 
         .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        .pag-btn { background: var(--bg-card); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 8px; font-weight: bold; }
+        .pag-btn { background: var(--bg-card-light); color: var(--accent); border: 1px solid var(--border); padding: 8px 15px; border-radius: 10px; font-weight: bold; }
 
-        /* --- ВКЛАДКА КАЗИНО --- */
-        .casino-box { display: flex; flex-direction: column; align-items: center; }
-        .slots { display: flex; gap: 10px; background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(186,255,0,0.2); }
+        .slots { display: flex; gap: 10px; background: white; padding: 15px; border-radius: 16px; margin-bottom: 20px; justify-content: center; }
         .slot { font-size: 40px; }
-        .bet-input { padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; width: 100px; text-align: center; font-size: 18px; margin-bottom: 15px; }
+        .bet-input { padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-dark); color: white; width: 100px; text-align: center; font-size: 18px; margin: 0 auto 15px; display: block; }
 
-        /* --- ОБНОВЛЕНИЯ --- */
-        .horror-container { display: flex; justify-content: center; align-items: center; height: 50vh; }
-        .horror-text { font-family: 'Impact', fantasy; font-size: 55px; color: #ff0000; text-shadow: 0 0 20px #ff0000; animation: brokenLamp 5s infinite; }
-        @keyframes brokenLamp { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
-
-        /* --- НИЖНЕЕ МЕНЮ --- */
         .nav-bar {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            background: #0a2415;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 5px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            border-top: 1px solid var(--border-color);
-            z-index: 99999;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(8, 26, 17, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around;
+            padding: 10px 5px; padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--border); z-index: 99999;
         }
-        .nav-btn {
-            background: none; border: none;
-            color: var(--text-muted);
-            font-size: 10px;
-            display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; width: 19%;
-        }
+        .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
         .nav-btn .icon { font-size: 20px; margin-bottom: 4px; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn.active .icon { filter: drop-shadow(0 0 5px var(--accent)); }
+
+        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; text-shadow: 0 0 20px #ff0000; animation: brokenLamp 5s infinite; }
+        @keyframes brokenLamp { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <!-- ПИТОМЕЦ -->
-    <div id="tab-pet" class="tab-content active">
-        <div class="card">
-            <div class="profile-header">
-                <div>
-                    <div class="section-title">ТВОЙ ПРОФИЛЬ</div>
-                    <div class="profile-name" id="username">Игрок</div>
-                </div>
-                <div class="status-badge">ОНЛАЙН</div>
-            </div>
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <div id="tab-main" class="tab-content active">
+        <h1>Привет, <span id="username">друг</span>!</h1>
+        <div class="subtitle">Твой личный уголок в Пристоле Архангела</div>
 
-            <div class="mood-selector">
-                <div class="mood" onclick="setMood(this)"><span class="mood-dot" style="background:#ff4d4d"></span>Плохо</div>
-                <div class="mood active" onclick="setMood(this)"><span class="mood-dot" style="background:#ffd700"></span>Нормально</div>
-                <div class="mood" onclick="setMood(this)"><span class="mood-dot" style="background:#baff00"></span>Хорошо</div>
-            </div>
-
-            <div class="action-grid">
-                <button class="btn btn-accent" id="btn-work">Поработать (+1 🪙)</button>
-                <button class="btn btn-outline" onclick="switchTab('promo')">Промокод</button>
-            </div>
-
-            <div class="pet-area">
-                <div class="pet-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" id="pet-image">
-                    <div id="pet-accessory" class="accessory"></div>
-                </div>
-                <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Пристол Архангела</div>
-                
-                <div class="bar-container" style="width: 100%;">
-                    <div class="bar-label"><span>Сытость</span> <span id="hunger-percent">100%</span></div>
-                    <div class="bar-bg"><div class="bar-fill" id="hunger-bar" style="background: var(--accent); width: 100%;"></div></div>
-                </div>
-
-                <div class="bar-container" style="width: 100%;">
-                    <div class="bar-label"><span>Опыт (Ур. <span id="level-text">1</span>)</span> <span id="xp-percent">0/100</span></div>
-                    <div class="bar-bg"><div class="bar-fill" id="xp-bar" style="background: #9C27B0; width: 0%;"></div></div>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="title">Монеты</div>
-                    <div class="value" style="color: var(--gold);">🪙 <span id="coin-amount">0</span></div>
-                </div>
-                <div class="stat-box">
-                    <div class="title">Купюры</div>
-                    <div class="value" style="color: var(--accent);">💵 <span id="bill-amount">0</span></div>
-                </div>
-            </div>
+        <div class="action-grid">
+            <button class="btn btn-accent" onclick="switchTab('pet')">🐱 Тамагочи</button>
+            <button class="btn btn-accent" onclick="switchTab('promo')">🎁 Промокоды</button>
+            <button class="btn btn-outline" onclick="switchTab('casino')">🎮 Казино</button>
+            <button class="btn btn-outline" onclick="switchTab('admins')">👤 Админы</button>
         </div>
 
-        <div class="section-title" style="margin-left: 5px;">МАГАЗИН</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="title">Монеты</div>
+                <div class="value" style="color: var(--gold);">🪙 <span id="coin-main">0</span></div>
+            </div>
+            <div class="stat-box">
+                <div class="title">Купюры</div>
+                <div class="value" style="color: var(--accent);">💵 <span id="bill-main">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПИТОМЕЦ -->
+    <div id="tab-pet" class="tab-content">
+        <div class="card profile-card">
+            <div class="avatar-wrapper">
+                <!-- ССЫЛКА НА АНИМЕ-ДЕВОЧКУ С УШКАМИ -->
+                <img src="https://i.pinimg.com/736x/8e/7e/85/8e7e85e6b6b2b3b7b8b9b0b1b2b3b4b5.jpg" id="pet-image">
+                <div id="pet-accessory" class="accessory"></div>
+            </div>
+            
+            <div class="profile-name">Тамагочи</div>
+            <div class="profile-status">ОНЛАЙН</div>
+
+            <div class="mood-row">
+                <div class="mood-btn"><span class="dot" style="background:#ff4d4d"></span> Плохо</div>
+                <div class="mood-btn active"><span class="dot" style="background:#ffd700"></span> Нормально</div>
+                <div class="mood-btn"><span class="dot" style="background:#c4ff0d"></span> Хорошо</div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label"><span>🍔 Сытость</span> <span id="hunger-text">100%</span></div>
+                <div class="bar-bg"><div class="bar-fill" id="hunger-bar" style="background: var(--accent); width: 100%;"></div></div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label"><span>⭐ Опыт (Ур. <span id="level-main">1</span>)</span> <span id="xp-main">0/100</span></div>
+                <div class="bar-bg"><div class="bar-fill" id="xp-bar" style="background: #9C27B0; width: 0%;"></div></div>
+            </div>
+
+            <button class="btn btn-accent" style="margin-top: 15px;" onclick="earnCoin()">Поработать (+1 🪙)</button>
+        </div>
+
         <div class="shop-tabs">
-            <button class="shop-tab active" id="tab-shop-acc">Аксессуары</button>
-            <button class="shop-tab" id="tab-shop-food">Еда</button>
+            <button class="shop-tab active" id="tab-shop-acc" onclick="switchShop('acc')">Одежда</button>
+            <button class="shop-tab" id="tab-shop-food" onclick="switchShop('food')">Еда</button>
         </div>
 
         <div id="shop-accessories" class="shop-grid active"><div id="acc-container" style="display: contents;"></div></div>
         <div id="acc-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="acc-prev">Назад</button>
-            <span style="font-size: 12px; color: var(--text-muted);">Стр. <span id="acc-page">1</span></span>
-            <button class="pag-btn" id="acc-next">Вперед</button>
+            <button class="pag-btn" onclick="changePage('acc', -1)">Назад</button>
+            <span style="font-size: 12px; font-weight:bold;">Стр. <span id="acc-page">1</span></span>
+            <button class="pag-btn" onclick="changePage('acc', 1)">Вперед</button>
         </div>
 
         <div id="shop-food" class="shop-grid"><div id="food-container" style="display: contents;"></div></div>
         <div id="food-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="food-prev">Назад</button>
-            <span style="font-size: 12px; color: var(--text-muted);">Стр. <span id="food-page">1</span></span>
-            <button class="pag-btn" id="food-next">Вперед</button>
-        </div>
-    </div>
-
-    <!-- АДМИНЫ -->
-    <div id="tab-admins" class="tab-content">
-        <div class="card">
-            <div class="section-title">ОБРАЩЕНИЕ</div>
-            <h2 style="font-size: 24px; margin-bottom: 5px;">Мой админ</h2>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Сейчас с тобой на связи наша команда.</p>
-            
-            <button class="btn btn-accent" style="margin-bottom: 10px;">Написать админу</button>
-            <button class="btn btn-outline">Позвать админа</button>
-        </div>
-
-        <div class="section-title" style="margin-left: 5px;">СПИСОК КОМАНДЫ</div>
-        <div class="card" style="display:flex; align-items:center; padding: 15px;">
-            <span style="font-size:24px; margin-right:15px;">👑</span>
-            <div><div style="font-weight:bold; font-size: 16px;">Демон</div><div style="color:var(--accent); font-size:12px;">Владелец</div></div>
-        </div>
-        <div class="card" style="display:flex; align-items:center; padding: 15px;">
-            <span style="font-size:24px; margin-right:15px;">🛡️</span>
-            <div><div style="font-weight:bold; font-size: 16px;">Фембой</div><div style="color:var(--text-muted); font-size:12px;">Админ</div></div>
-        </div>
-        <div class="card" style="display:flex; align-items:center; padding: 15px;">
-            <span style="font-size:24px; margin-right:15px;">🐺</span>
-            <div><div style="font-weight:bold; font-size: 16px;">Псина</div><div style="color:var(--text-muted); font-size:12px;">Админ</div></div>
+            <button class="pag-btn" onclick="changePage('food', -1)">Назад</button>
+            <span style="font-size: 12px; font-weight:bold;">Стр. <span id="food-page">1</span></span>
+            <button class="pag-btn" onclick="changePage('food', 1)">Вперед</button>
         </div>
     </div>
 
     <!-- КАЗИНО -->
     <div id="tab-casino" class="tab-content">
-        <div class="card casino-box">
-            <div class="section-title">МИНИ-ИГРА</div>
-            <h2 style="font-size: 24px; margin-bottom: 20px;">🎰 Удача</h2>
+        <h1>Казино</h1>
+        <div class="subtitle">Испытай удачу</div>
+        <div class="card" style="text-align: center;">
             <div class="slots">
                 <div id="slot1" class="slot">🍒</div>
                 <div id="slot2" class="slot">🍋</div>
                 <div id="slot3" class="slot">🔔</div>
             </div>
             <input type="number" id="bet-input" class="bet-input" value="5" min="5">
-            <button class="btn btn-accent" id="spin-btn" style="width: 100%;">КРУТИТЬ (Мин. 5 💵)</button>
+            <button class="btn btn-accent" onclick="spin()">КРУТИТЬ</button>
+            <div style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Мин. ставка 5 💵</div>
+        </div>
+    </div>
+
+    <!-- АДМИНЫ -->
+    <div id="tab-admins" class="tab-content">
+        <h1>Админы</h1>
+        <div class="card" style="display:flex; align-items:center; margin-bottom: 10px;">
+            <span style="font-size:30px; margin-right:15px;">👑</span>
+            <div><div style="font-weight:900; font-size: 18px;">Демон</div><div style="color:var(--accent); font-size:12px; font-weight:bold;">Владелец</div></div>
         </div>
     </div>
 
     <!-- ПРОМО -->
     <div id="tab-promo" class="tab-content">
+        <h1>Промокоды</h1>
         <div class="card">
-            <div class="section-title">АКТИВАЦИЯ КОДА</div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <input type="text" id="promo-input" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; outline: none;" placeholder="Введите код...">
-                <button class="btn btn-accent" id="btn-promo" style="width: 100px;">Ввод</button>
-            </div>
-            <div id="promo-result" style="text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px;"></div>
+            <input type="text" id="promo-input" placeholder="Введите код..." style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-dark); color: white; margin-bottom: 10px; font-size: 16px;">
+            <button class="btn btn-accent" onclick="checkPromo()">Активировать</button>
+            <div id="promo-result" style="text-align: center; font-weight: bold; margin-top: 15px;"></div>
         </div>
     </div>
 
     <!-- ОБНОВЫ -->
     <div id="tab-updates" class="tab-content">
-        <div class="horror-container"><div class="horror-text">КОГДА-ТО</div></div>
+        <div class="horror-text">КОГДА-ТО</div>
     </div>
 
     <!-- ИНФО -->
     <div id="tab-info" class="tab-content">
-        <div class="card" style="padding: 0; overflow: hidden;">
-            <img src="https://i.postimg.cc/6pj3mR8m/IMG-20261122-161125-999.jpg" style="width: 100%; display: block;">
-        </div>
+        <h1>Информация</h1>
         <div class="card">
             <div style="text-align: center; font-style: italic; color: var(--text-muted); margin-bottom: 15px;">Вы поднялись в небеса и вам нужен небесный компас.</div>
-            <div class="section-title">{1} СУД ВСЕВЫШНИХ</div>
-            <div style="font-size: 14px; margin-bottom: 10px;">🪽 <b>[Книга судеб]</b> → отзывы.</div>
-            <div style="font-size: 14px; margin-bottom: 15px;">🪽 <b>[Испытания небес]</b> → проверки.</div>
-            
             <div class="section-title">{5} РОКОТ НЕБЕС</div>
-            <div style="font-size: 14px;">🪽 <b>[Рука помощи]</b> → <a href="https://t.me/Tech_nicalsupportpristol_bot" style="color: var(--accent); text-decoration: none;">Тех.поддержка</a></div>
+            <div style="font-size: 14px;">🪽 <b>[Рука помощи]</b> → <a href="https://t.me/Tech_nicalsupportpristol_bot" style="color: var(--accent); text-decoration: none; font-weight: bold;">Тех.поддержка</a></div>
         </div>
     </div>
 
     <!-- НАВИГАЦИЯ -->
     <div class="nav-bar">
-        <button class="nav-btn active" data-tab="pet"><span class="icon">🔥</span><span>Питомец</span></button>
-        <button class="nav-btn" data-tab="admins"><span class="icon">👤</span><span>Админ</span></button>
-        <button class="nav-btn" id="casino-btn" data-tab="casino" style="display:none;"><span class="icon">🎮</span><span>Игры</span></button>
-        <button class="nav-btn" data-tab="promo"><span class="icon">📝</span><span>Промо</span></button>
-        <button class="nav-btn" data-tab="updates"><span class="icon">🔄</span><span>Обновы</span></button>
-        <button class="nav-btn" data-tab="info"><span class="icon">ℹ️</span><span>Инфо</span></button>
+        <button class="nav-btn" id="nav-main" onclick="switchTab('main')"><span class="icon">🏠</span><span>Главная</span></button>
+        <button class="nav-btn active" id="nav-pet" onclick="switchTab('pet')"><span class="icon">🐱</span><span>Тамагочи</span></button>
+        <button class="nav-btn" id="nav-casino" onclick="switchTab('casino')"><span class="icon">🎮</span><span>Казино</span></button>
+        <button class="nav-btn" id="nav-promo" onclick="switchTab('promo')"><span class="icon">🎁</span><span>Промо</span></button>
+        <button class="nav-btn" id="nav-admins" onclick="switchTab('admins')"><span class="icon">👤</span><span>Админы</span></button>
     </div>
 
     <script>
-        // Запускаем после полной загрузки
-        window.addEventListener('load', function() {
-            try {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
+        try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e) {}
+        
+        try {
+            const user = Telegram.WebApp.initDataUnsafe?.user;
+            if (user) document.getElementById('username').textContent = user.first_name;
+        } catch(e) {}
 
-                const user = Telegram.WebApp.initDataUnsafe?.user;
-                if (user) document.getElementById('username').textContent = user.first_name;
+        function getVal(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
+        function setVal(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
-                // Память
-                function getVal(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
-                function setVal(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+        let currentCoins = parseInt(getVal('coins', '0'));
+        let currentBills = parseInt(getVal('bills', '0'));
+        let currentXP = parseInt(getVal('xp', '0'));
+        let currentLevel = parseInt(getVal('level', '1'));
+        let hunger = parseInt(getVal('hunger', '100'));
+        let boughtItems = JSON.parse(getVal('boughtItems', '[]'));
+        let equippedItem = getVal('equippedItem', '');
 
-                let currentCoins = parseInt(getVal('coins', '0'));
-                let currentBills = parseInt(getVal('bills', '0'));
-                let currentXP = parseInt(getVal('xp', '0'));
-                let currentLevel = parseInt(getVal('level', '1'));
-                let hunger = parseInt(getVal('hunger', '100'));
-                let boughtItems = JSON.parse(getVal('boughtItems', '[]'));
-                let equippedItem = getVal('equippedItem', '');
-                let hasAnimeCat = getVal('hasAnimeCat', 'false') === 'true';
+        // --- ССЫЛКА НА НОВУЮ АНИМЕ-ДЕВОЧКУ (С УШКАМИ) ---
+        const myAvatarUrl = "https://i.pinimg.com/736x/8e/7e/85/8e7e85e6b6b2b3b7b8b9b0b1b2b3b4b5.jpg"; // Здесь ссылка на картинку со скрина
+        // Если захочешь свою, просто замени ссылку в кавычках на свою с postimages.org
 
-                const defaultCatUrl = "https://cdn-icons-png.flaticon.com/512/616/616430.png";
-                const animeCatUrl = "https://i.postimg.cc/7Yb6G4q7/29c8a93e13a7f82e738d5e241e4202fc.jpg";
+        // Генерация магазина
+        const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽', '💍', '📿', '👔', '👕', '🧥', '👗', '👘', '🩱', '🥋', '🦺'];
+        const shopItems = [];
+        for (let i = 0; i < 100; i++) {
+            shopItems.push({ id: 'acc_' + i, name: 'Аксессуар ' + (i + 1), price: 10 + (i * 2), emoji: accEmojis[i % accEmojis.length], type: ['hat', 'crown', 'glasses', 'bow'][i % 4] });
+        }
 
-                // Генерация
-                const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽', '💍', '📿', '👔', '👕', '🧥', '👗', '👘', '🩱', '🥋', '🦺'];
-                const shopItems = [];
-                for (let i = 0; i < 100; i++) {
-                    shopItems.push({ id: 'acc_' + i, name: 'Аксессуар ' + (i + 1), price: 10 + (i * 2), emoji: accEmojis[i % accEmojis.length], type: ['hat', 'crown', 'glasses', 'bow'][i % 4] });
+        const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿', '🥗', '🥩', '🍗', '🍟', '🌭', '🥪', '🌮', '🥟', '🍱', '🍚'];
+        const foodItems = [];
+        for (let i = 0; i < 100; i++) {
+            foodItems.push({ id: 'food_' + i, name: 'Еда ' + (i + 1), price: 5 + (i * 1), feed: 10 + (i % 20), emoji: foodEmojis[i % foodEmojis.length] });
+        }
+
+        const promoCodes = {};
+        for (let i = 1; i <= 100; i++) promoCodes['бонус' + i] = { coins: i * 10, bills: i };
+        promoCodes['1000 купюр'] = { coins: 0, bills: 1000 };
+        promoCodes['admin_999999999999'] = { coins: 999999999999, bills: 999999999999, xp: 999999 };
+
+        function updateUI() {
+            document.getElementById('coin-main').textContent = currentCoins;
+            document.getElementById('bill-main').textContent = currentBills;
+            document.getElementById('level-main').textContent = currentLevel;
+            document.getElementById('xp-main').textContent = currentXP + '/100';
+
+            hunger = Math.max(0, hunger); 
+            document.getElementById('hunger-text').textContent = hunger + '%';
+            const hb = document.getElementById('hunger-bar');
+            hb.style.width = hunger + '%';
+            hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
+            
+            const xpb = document.getElementById('xp-bar');
+            xpb.style.width = Math.min(100, currentXP) + '%';
+
+            // Устанавливаем аватарку
+            document.getElementById('pet-image').src = myAvatarUrl;
+
+            // Аксессуар
+            const acc = document.getElementById('pet-accessory');
+            acc.className = 'accessory';
+            acc.style.display = 'none';
+            if (equippedItem) {
+                const item = shopItems.find(i => i.id === equippedItem);
+                if (item) {
+                    acc.textContent = item.emoji;
+                    if (item.type === 'hat' || item.type === 'crown') { acc.style.top = '-15px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)'; acc.style.fontSize = '45px'; }
+                    else if (item.type === 'glasses') { acc.style.top = '55px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)'; acc.style.fontSize = '30px'; }
+                    else { acc.style.top = '10px'; acc.style.right = '15px'; acc.style.transform = 'rotate(25deg)'; acc.style.fontSize = '30px'; }
+                    acc.style.display = 'block';
                 }
+            }
+        }
 
-                const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿', '🥗', '🥩', '🍗', '🍟', '🌭', '🥪', '🌮', '🥟', '🍱', '🍚'];
-                const foodItems = [];
-                for (let i = 0; i < 100; i++) {
-                    foodItems.push({ id: 'food_' + i, name: 'Еда ' + (i + 1), price: 5 + (i * 1), feed: 10 + (i % 20), emoji: foodEmojis[i % foodEmojis.length] });
-                }
-
-                const promoCodes = {};
-                for (let i = 1; i <= 100; i++) promoCodes['бонус' + i] = { coins: i * 10, bills: i };
-                promoCodes['1000 купюр'] = { coins: 0, bills: 1000 };
-                promoCodes['кошка'] = { cat: true };
-                promoCodes['admin_999999999999'] = { coins: 999999999999, bills: 999999999999, xp: 999999 };
-
-                function updateUI() {
-                    document.getElementById('coin-amount').textContent = currentCoins;
-                    document.getElementById('bill-amount').textContent = currentBills;
-                    
-                    hunger = Math.max(0, hunger); 
-                    document.getElementById('
+        let accPage = 1, foodPage = 1;
+        const itemsPerPage = 10;
+        
+        function renderAccPage() {
+            const c = document.getElementById('acc-container'); c.innerHTML = '';
+            shopItems.slice((accPage - 1) * itemsPerPage, accPage * itemsPerPage).forEach(item => {
+                const div = document.createElement('div'); div.className = 'shop-item';
+                div.innerHTML = `<div class="icon">${item.emoji}</div><div class="name">${item.name}</div><div class="price">${item.price} 🪙</div><button class="btn btn-outline" style="padding:6px 10px; font-size:12px;" onclick="buyItem('${item.id}', ${item.price})">Купить</button>`;
+                c.appendChild(div);
+            });
+            document.getElementById('acc-page').textContent = accPage;
+            document.getElementById('acc-pagination').style.dis
