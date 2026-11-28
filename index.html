@@ -7,364 +7,313 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
-
-        :root {
-            --bg-dark: #081a11;
-            --bg-card: #0e2b1c;
-            --bg-card-light: #143b26;
-            --accent: #c4ff0d;
-            --text-main: #ffffff;
-            --text-muted: #7da08c;
-            --border: #1a402d;
-            --gold: #ffd700;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            padding: 15px;
-            padding-bottom: 90px;
-            overflow-x: hidden;
-        }
-
-        /* Блок для вывода ошибок */
-        #error-log {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: #ff4d4d; color: white; padding: 10px;
-            z-index: 999999; font-size: 12px; font-weight: bold;
-        }
-
+        :root { --bg: #081a11; --card: #0e2b1c; --light: #143b26; --acc: #c4ff0d; --text: #fff; --muted: #7da08c; --border: #1a402d; --gold: #ffd700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding: 15px; padding-bottom: 90px; }
+        
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
+        .tab-content.active { display: block; animation: fade 0.2s; }
+        @keyframes fade { from {opacity: 0;} to {opacity: 1;} }
+        
         h1 { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
-        .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
-        .section-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 800; }
-
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            transition: 0.1s;
-            user-select: none;
-        }
+        .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
+        .section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 800; }
+        
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.1s; }
         .btn:active { transform: scale(0.96); }
-        .btn-accent { background-color: var(--accent); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-
-        .action-grid { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .action-grid .btn { flex: 1; min-width: 45%; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; }
-        .stat-box .title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
+        .btn-acc { background: var(--acc); color: #000; }
+        .btn-out { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .grid .btn { flex: 1; }
+        
+        .stat-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; }
+        .stat-box .title { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
         .stat-box .value { font-size: 22px; font-weight: 900; }
-
-        .profile-card { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
-        .avatar-wrapper { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
-        .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 15px rgba(196, 255, 13, 0.2); }
-        .accessory { position: absolute; font-size: 40px; z-index: 10; display: none; text-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-
-        .profile-name { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
-        .profile-status { background: rgba(196, 255, 13, 0.1); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px; display: inline-block; }
-
-        .mood-row { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; width: 100%;}
-        .mood-btn { background: var(--bg-card-light); border: 1px solid var(--border); padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; color: var(--text-muted); }
-        .mood-btn.active { border-color: var(--accent); color: var(--text-main); }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-
+        
+        .prof-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .avatar { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--acc); }
+        .accessory { position: absolute; font-size: 40px; z-index: 10; display: none; }
+        
         .bar-container { margin-bottom: 10px; width: 100%; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+        .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: bold; }
         .bar-bg { height: 8px; background: #1a402d; border-radius: 4px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
-
-        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-card); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
-        .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 800; font-size: 13px; cursor: pointer; }
-        .shop-tab.active { background: var(--bg-card-light); color: var(--text-main); }
+        
+        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: var(--card); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
+        .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer; }
+        .shop-tab.active { background: var(--light); color: var(--text); }
         
         .shop-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
         .shop-grid.active { display: grid; }
-        .shop-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .shop-item { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .shop-item .icon { font-size: 30px; margin-bottom: 5px; }
         .shop-item .name { font-size: 12px; font-weight: 600; margin-bottom: 5px; height: 30px; overflow: hidden; }
         .shop-item .price { color: var(--gold); font-weight: 900; margin-bottom: 10px; font-size: 14px; }
-
+        
         .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        .pag-btn { background: var(--bg-card-light); color: var(--accent); border: 1px solid var(--border); padding: 8px 15px; border-radius: 10px; font-weight: bold; }
-
+        .pag-btn { background: var(--light); color: var(--acc); border: 1px solid var(--border); padding: 8px 15px; border-radius: 10px; font-weight: bold; }
+        
         .slots { display: flex; gap: 10px; background: white; padding: 15px; border-radius: 16px; margin-bottom: 20px; justify-content: center; }
         .slot { font-size: 40px; }
-        .bet-input { padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-dark); color: white; width: 100px; text-align: center; font-size: 18px; margin: 0 auto 15px; display: block; }
-
-        .nav-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(8, 26, 17, 0.95); backdrop-filter: blur(10px);
-            display: flex; justify-content: space-around;
-            padding: 10px 5px; padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            border-top: 1px solid var(--border); z-index: 99999;
-        }
-        .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
+        .bet-input { padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: white; width: 100px; text-align: center; font-size: 18px; margin: 0 auto 15px; display: block; }
+        
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(8, 26, 17, 0.95); display: flex; justify-content: space-around; padding: 10px 5px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); z-index: 9999; }
+        .nav-btn { background: none; border: none; color: var(--muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
         .nav-btn .icon { font-size: 20px; margin-bottom: 4px; }
-        .nav-btn.active { color: var(--accent); }
-
-        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; text-shadow: 0 0 20px #ff0000; animation: brokenLamp 5s infinite; }
-        @keyframes brokenLamp { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
+        .nav-btn.active { color: var(--acc); }
+        
+        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; animation: blink 5s infinite; }
+        @keyframes blink { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
     </style>
 </head>
 <body>
-    
-    <!-- Блок для вывода ошибок -->
-    <div id="error-log"></div>
-
-    <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="tab-main" class="tab-content active">
         <h1>Привет, <span id="username">Игрок</span>!</h1>
-        <div class="subtitle">Твой личный уголок в Пристоле Архангела</div>
-
-        <div class="action-grid">
-            <button class="btn btn-accent nav-link" data-target="pet">🐱 Тамагочи</button>
-            <button class="btn btn-accent nav-link" data-target="promo">🎁 Промокоды</button>
-            <button class="btn btn-outline nav-link" data-target="casino">🎮 Казино</button>
-            <button class="btn btn-outline nav-link" data-target="admins">👤 Админы</button>
+        <div class="subtitle">Твой личный уголок</div>
+        <div class="grid">
+            <button class="btn btn-acc" onclick="goTo('pet')">🐱 Тамагочи</button>
+            <button class="btn btn-acc" onclick="goTo('promo')">🎁 Промокоды</button>
+            <button class="btn btn-out" onclick="goTo('casino')">🎮 Казино</button>
+            <button class="btn btn-out" onclick="goTo('admins')">👤 Админы</button>
         </div>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="title">Монеты</div>
-                <div class="value" style="color: var(--gold);">🪙 <span id="coin-main">0</span></div>
-            </div>
-            <div class="stat-box">
-                <div class="title">Купюры</div>
-                <div class="value" style="color: var(--accent);">💵 <span id="bill-main">0</span></div>
-            </div>
+        <div class="grid">
+            <div class="stat-box"><div class="title">Монеты</div><div class="value" style="color: var(--gold);">🪙 <span id="coin-main">0</span></div></div>
+            <div class="stat-box"><div class="title">Купюры</div><div class="value" style="color: var(--acc);">💵 <span id="bill-main">0</span></div></div>
         </div>
     </div>
 
-    <!-- ПИТОМЕЦ -->
     <div id="tab-pet" class="tab-content">
-        <div class="card profile-card">
-            <div class="avatar-wrapper">
+        <div class="card prof-card">
+            <div class="avatar">
                 <img src="https://i.pinimg.com/736x/8e/7e/85/8e7e85e6b6b2b3b7b8b9b0b1b2b3b4b5.jpg" id="pet-image">
                 <div id="pet-accessory" class="accessory"></div>
             </div>
+            <h2 style="font-weight:900; margin-bottom:5px;">Тамагочи</h2>
+            <div style="background:rgba(196,255,13,0.1); color:var(--acc); padding:5px 12px; border-radius:20px; font-size:12px; font-weight:bold; margin-bottom:15px; display:inline-block;">ОНЛАЙН</div>
             
-            <div class="profile-name">Тамагочи</div>
-            <div class="profile-status">ОНЛАЙН</div>
-
-            <div class="mood-row">
-                <div class="mood-btn"><span class="dot" style="background:#ff4d4d"></span> Плохо</div>
-                <div class="mood-btn active"><span class="dot" style="background:#ffd700"></span> Нормально</div>
-                <div class="mood-btn"><span class="dot" style="background:#c4ff0d"></span> Хорошо</div>
-            </div>
-
             <div class="bar-container">
                 <div class="bar-label"><span>🍔 Сытость</span> <span id="hunger-text">100%</span></div>
-                <div class="bar-bg"><div class="bar-fill" id="hunger-bar" style="background: var(--accent); width: 100%;"></div></div>
+                <div class="bar-bg"><div class="bar-fill" id="hunger-bar" style="background: var(--acc); width: 100%;"></div></div>
             </div>
-
             <div class="bar-container">
                 <div class="bar-label"><span>⭐ Опыт (Ур. <span id="level-main">1</span>)</span> <span id="xp-main">0/100</span></div>
                 <div class="bar-bg"><div class="bar-fill" id="xp-bar" style="background: #9C27B0; width: 0%;"></div></div>
             </div>
-
-            <button class="btn btn-accent" id="btn-work" style="margin-top: 15px;">Поработать (+1 🪙)</button>
+            <button class="btn btn-acc" onclick="work()" style="margin-top: 15px;">Поработать (+1 🪙)</button>
         </div>
-
         <div class="shop-tabs">
-            <button class="shop-tab active" id="btn-shop-acc">Одежда</button>
-            <button class="shop-tab" id="btn-shop-food">Еда</button>
+            <button class="shop-tab active" id="btn-shop-acc" onclick="shopTab('acc')">Одежда</button>
+            <button class="shop-tab" id="btn-shop-food" onclick="shopTab('food')">Еда</button>
         </div>
-
         <div id="shop-accessories" class="shop-grid active"><div id="acc-container" style="display: contents;"></div></div>
         <div id="acc-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="acc-prev">Назад</button>
+            <button class="pag-btn" onclick="changePage('acc', -1)">Назад</button>
             <span style="font-size: 12px; font-weight:bold;">Стр. <span id="acc-page">1</span></span>
-            <button class="pag-btn" id="acc-next">Вперед</button>
+            <button class="pag-btn" onclick="changePage('acc', 1)">Вперед</button>
         </div>
-
         <div id="shop-food" class="shop-grid"><div id="food-container" style="display: contents;"></div></div>
         <div id="food-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="food-prev">Назад</button>
+            <button class="pag-btn" onclick="changePage('food', -1)">Назад</button>
             <span style="font-size: 12px; font-weight:bold;">Стр. <span id="food-page">1</span></span>
-            <button class="pag-btn" id="food-next">Вперед</button>
+            <button class="pag-btn" onclick="changePage('food', 1)">Вперед</button>
         </div>
     </div>
 
-    <!-- КАЗИНО -->
     <div id="tab-casino" class="tab-content">
         <h1>Казино</h1>
-        <div class="subtitle">Испытай удачу</div>
         <div class="card" style="text-align: center;">
             <div class="slots">
-                <div id="slot1" class="slot">🍒</div>
-                <div id="slot2" class="slot">🍋</div>
-                <div id="slot3" class="slot">🔔</div>
+                <div id="slot1" class="slot">🍒</div><div id="slot2" class="slot">🍋</div><div id="slot3" class="slot">🔔</div>
             </div>
             <input type="number" id="bet-input" class="bet-input" value="5" min="5">
-            <button class="btn btn-accent" id="btn-spin">КРУТИТЬ</button>
-            <div style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Мин. ставка 5 💵</div>
+            <button class="btn btn-acc" onclick="spin()">КРУТИТЬ</button>
         </div>
     </div>
 
-    <!-- АДМИНЫ -->
     <div id="tab-admins" class="tab-content">
         <h1>Админы</h1>
-        <div class="card" style="display:flex; align-items:center; margin-bottom: 10px;">
+        <div class="card">
             <span style="font-size:30px; margin-right:15px;">👑</span>
-            <div><div style="font-weight:900; font-size: 18px;">Демон</div><div style="color:var(--accent); font-size:12px; font-weight:bold;">Владелец</div></div>
+            <b>Демон</b> <span style="color:var(--acc); font-size:12px; margin-left:auto;">Владелец</span>
         </div>
     </div>
 
-    <!-- ПРОМО -->
     <div id="tab-promo" class="tab-content">
         <h1>Промокоды</h1>
         <div class="card">
-            <input type="text" id="promo-input" placeholder="Введите код..." style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-dark); color: white; margin-bottom: 10px; font-size: 16px;">
-            <button class="btn btn-accent" id="btn-promo">Активировать</button>
+            <input type="text" id="promo-input" placeholder="Введите код..." style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: white; margin-bottom: 10px;">
+            <button class="btn btn-acc" onclick="checkPromo()">Активировать</button>
             <div id="promo-result" style="text-align: center; font-weight: bold; margin-top: 15px;"></div>
         </div>
     </div>
 
-    <!-- ОБНОВЫ -->
-    <div id="tab-updates" class="tab-content">
-        <div class="horror-text">КОГДА-ТО</div>
-    </div>
+    <div id="tab-updates" class="tab-content"><div class="horror-text">КОГДА-ТО</div></div>
 
-    <!-- ИНФО -->
-    <div id="tab-info" class="tab-content">
-        <h1>Информация</h1>
-        <div class="card">
-            <div style="text-align: center; font-style: italic; color: var(--text-muted); margin-bottom: 15px;">Вы поднялись в небеса и вам нужен небесный компас.</div>
-            <div class="section-title">{5} РОКОТ НЕБЕС</div>
-            <div style="font-size: 14px;">🪽 <b>[Рука помощи]</b> → <a href="https://t.me/Tech_nicalsupportpristol_bot" style="color: var(--accent); text-decoration: none; font-weight: bold;">Тех.поддержка</a></div>
-        </div>
-    </div>
-
-    <!-- НАВИГАЦИЯ -->
     <div class="nav-bar">
-        <button class="nav-btn nav-link" data-target="main"><span class="icon">🏠</span><span>Главная</span></button>
-        <button class="nav-btn active nav-link" data-target="pet"><span class="icon">🐱</span><span>Тамагочи</span></button>
-        <button class="nav-btn nav-link" data-target="casino"><span class="icon">🎮</span><span>Казино</span></button>
-        <button class="nav-btn nav-link" data-target="promo"><span class="icon">🎁</span><span>Промо</span></button>
-        <button class="nav-btn nav-link" data-target="admins"><span class="icon">👤</span><span>Админы</span></button>
+        <button class="nav-btn" onclick="goTo('main')" id="nav-main"><span class="icon">🏠</span><span>Главная</span></button>
+        <button class="nav-btn active" onclick="goTo('pet')" id="nav-pet"><span class="icon">🐱</span><span>Тамагочи</span></button>
+        <button class="nav-btn" onclick="goTo('casino')" id="nav-casino"><span class="icon">🎮</span><span>Казино</span></button>
+        <button class="nav-btn" onclick="goTo('promo')" id="nav-promo"><span class="icon">🎁</span><span>Промо</span></button>
+        <button class="nav-btn" onclick="goTo('admins')" id="nav-admins"><span class="icon">👤</span><span>Админы</span></button>
     </div>
 
     <script>
-        // Ловим все ошибки и выводим на экран
-        window.addEventListener('error', function(e) {
-            const errDiv = document.getElementById('error-log');
-            errDiv.style.display = 'block';
-            errDiv.innerText = "ОШИБКА: " + e.message + " (Строка: " + e.lineno + ")";
-        });
+        // ТЕСТ: Если этот алерт не выскочил, значит Telegram блокирует JS полностью
+        setTimeout(function() { alert("Скрипт Mini App запущен!"); }, 500);
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Безопасное получение данных из Telegram
-            try {
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    
-                    const user = Telegram.WebApp.initDataUnsafe?.user;
-                    if (user && user.first_name) {
-                        document.getElementById('username').textContent = user.first_name;
-                    } else if (user && user.username) {
-                        document.getElementById('username').textContent = '@' + user.username;
-                    } else {
-                        document.getElementById('username').textContent = "Игрок";
-                    }
-                }
-            } catch(e) { console.log("Telegram WebApp не найден"); }
+        // Глобальные функции для onclick
+        let coins = parseInt(localStorage.getItem('coins') || '0');
+        let bills = parseInt(localStorage.getItem('bills') || '0');
+        let xp = parseInt(localStorage.getItem('xp') || '0');
+        let lvl = parseInt(localStorage.getItem('level') || '1');
+        let hunger = parseInt(localStorage.getItem('hunger') || '100');
+        let bought = JSON.parse(localStorage.getItem('bought') || '[]');
+        let equipped = localStorage.getItem('equipped') || '';
+        let pageAcc = 1, pageFood = 1;
 
-            // --- ДАННЫЕ ---
-            function getVal(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
-            function setVal(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+        const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽'];
+        const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿'];
 
-            let currentCoins = parseInt(getVal('coins', '0'));
-            let currentBills = parseInt(getVal('bills', '0'));
-            let currentXP = parseInt(getVal('xp', '0'));
-            let currentLevel = parseInt(getVal('level', '1'));
-            let hunger = parseInt(getVal('hunger', '100'));
-            let boughtItems = JSON.parse(getVal('boughtItems', '[]'));
-            let equippedItem = getVal('equippedItem', '');
+        function save() {
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('bills', bills);
+            localStorage.setItem('xp', xp);
+            localStorage.setItem('level', lvl);
+            localStorage.setItem('hunger', hunger);
+            localStorage.setItem('bought', JSON.stringify(bought));
+            localStorage.setItem('equipped', equipped);
+        }
 
-            const myAvatarUrl = "https://i.pinimg.com/736x/8e/7e/85/8e7e85e6b6b2b3b7b8b9b0b1b2b3b4b5.jpg"; 
-
-            const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽', '💍', '📿', '👔', '👕', '🧥', '👗', '👘', '🩱', '🥋', '🦺'];
-            const shopItems = [];
-            for (let i = 0; i < 100; i++) {
-                shopItems.push({ id: 'acc_' + i, name: 'Аксессуар ' + (i + 1), price: 10 + (i * 2), emoji: accEmojis[i % accEmojis.length], type: ['hat', 'crown', 'glasses', 'bow'][i % 4] });
-            }
-
-            const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿', '🥗', '🥩', '🍗', '🍟', '🌭', '🥪', '🌮', '🥟', '🍱', '🍚'];
-            const foodItems = [];
-            for (let i = 0; i < 100; i++) {
-                foodItems.push({ id: 'food_' + i, name: 'Еда ' + (i + 1), price: 5 + (i * 1), feed: 10 + (i % 20), emoji: foodEmojis[i % foodEmojis.length] });
-            }
-
-            const promoCodes = {};
-            for (let i = 1; i <= 100; i++) promoCodes['бонус' + i] = { coins: i * 10, bills: i };
-            promoCodes['1000 купюр'] = { coins: 0, bills: 1000 };
-            promoCodes['admin_999999999999'] = { coins: 999999999999, bills: 999999999999, xp: 999999 };
-
-            // --- ФУНКЦИИ ---
-            window.updateUI = function() {
-                document.getElementById('coin-main').textContent = currentCoins;
-                document.getElementById('bill-main').textContent = currentBills;
-                document.getElementById('level-main').textContent = currentLevel;
-                document.getElementById('xp-main').textContent = currentXP + '/100';
-
-                hunger = Math.max(0, hunger); 
-                document.getElementById('hunger-text').textContent = hunger + '%';
-                const hb = document.getElementById('hunger-bar');
-                hb.style.width = hunger + '%';
-                hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
-                
-                document.getElementById('xp-bar').style.width = Math.min(100, currentXP) + '%';
-                document.getElementById('pet-image').src = myAvatarUrl;
-
-                const acc = document.getElementById('pet-accessory');
-                acc.className = 'accessory';
-                acc.style.display = 'none';
-                if (equippedItem) {
-                    const item = shopItems.find(i => i.id === equippedItem);
-                    if (item) {
-                        acc.textContent = item.emoji;
-                        if (item.type === 'hat' || item.type === 'crown') { acc.style.top = '-15px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)'; acc.style.fontSize = '45px'; }
-                        else if (item.type === 'glasses') { acc.style.top = '55px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)'; acc.style.fontSize = '30px'; }
-                        else { acc.style.top = '10px'; acc.style.right = '15px'; acc.style.transform = 'rotate(25deg)'; acc.style.fontSize = '30px'; }
-                        acc.style.display = 'block';
-                    }
-                }
-            };
-
-            let accPage = 1, foodPage = 1;
-            const itemsPerPage = 10;
+        function updateUI() {
+            document.getElementById('coin-main').textContent = coins;
+            document.getElementById('bill-main').textContent = bills;
+            document.getElementById('level-main').textContent = lvl;
+            document.getElementById('xp-main').textContent = xp + '/100';
             
-            window.renderAccPage = function() {
-                const c = docume
+            document.getElementById('hunger-text').textContent = hunger + '%';
+            const hb = document.getElementById('hunger-bar');
+            hb.style.width = hunger + '%';
+            hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
+            
+            document.getElementById('xp-bar').style.width = Math.min(100, xp) + '%';
+            
+            const acc = document.getElementById('pet-accessory');
+            acc.style.display = 'none';
+            if (equipped) {
+                const idx = parseInt(equipped.split('_')[1]);
+                acc.textContent = accEmojis[idx % accEmojis.length];
+                acc.style.top = '-15px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)';
+                acc.style.fontSize = '45px';
+                acc.style.display = 'block';
+            }
+            save();
+        }
+
+        function goTo(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            document.getElementById('nav-' + id).classList.add('active');
+        }
+
+        function shopTab(type) {
+            document.getElementById('btn-shop-acc').classList.remove('active');
+            document.getElementById('btn-shop-food').classList.remove('active');
+            document.getElementById('shop-accessories').classList.remove('active');
+            document.getElementById('shop-food').classList.remove('active');
+            if(type === 'acc') {
+                document.getElementById('btn-shop-acc').classList.add('active');
+                document.getElementById('shop-accessories').classList.add('active');
+            } else {
+                document.getElementById('btn-shop-food').classList.add('active');
+                document.getElementById('shop-food').classList.add('active');
+            }
+        }
+
+        function renderShop() {
+            const c1 = document.getElementById('acc-container'); c1.innerHTML = '';
+            for(let i=(pageAcc-1)*10; i<pageAcc*10; i++) {
+                if(i>=100) break;
+                const price = 10 + (i*2);
+                c1.innerHTML += `<div class="shop-item"><div class="icon">${accEmojis[i%10]}</div><div class="name">Аксессуар ${i+1}</div><div class="price">${price} 🪙</div><button class="btn btn-out" onclick="buyItem('acc_${i}', ${price})">Купить</button></div>`;
+            }
+            document.getElementById('acc-pagination').style.display = 'flex';
+            document.getElementById('acc-page').textContent = pageAcc;
+
+            const c2 = document.getElementById('food-container'); c2.innerHTML = '';
+            for(let i=(pageFood-1)*10; i<pageFood*10; i++) {
+                if(i>=100) break;
+                const price = 5 + (i*1);
+                c2.innerHTML += `<div class="shop-item"><div class="icon">${foodEmojis[i%10]}</div><div class="name">Еда ${i+1}</div><div class="price">${price} 🪙</div><button class="btn btn-out" onclick="buyFood(${price}, ${10+(i%20)})">Купить</button></div>`;
+            }
+            document.getElementById('food-pagination').style.display = 'flex';
+            document.getElementById('food-page').textContent = pageFood;
+        }
+
+        function changePage(type, dir) {
+            if(type === 'acc') { if((pageAcc===1&&dir===-1)||(pageAcc===10&&dir===1)) return; pageAcc+=dir; renderShop(); }
+            else { if((pageFood===1&&dir===-1)||(pageFood===10&&dir===1)) return; pageFood+=dir; renderShop(); }
+        }
+
+        function work() {
+            coins++; xp+=10;
+            if(xp>=100) { xp-=100; lvl++; bills+=10; alert(`Новый уровень ${lvl}! +10 💵`); }
+            updateUI();
+        }
+
+        function buyItem(id, price) {
+            if(bought.includes(id)) { equipped = (equipped===id)?'':id; updateUI(); return; }
+            if(coins>=price) { coins-=price; bought.push(id); equipped=id; updateUI(); alert("Куплено!"); }
+            else alert("Мало монет!");
+        }
+
+        function buyFood(price, feed) {
+            if(coins>=price) { coins-=price; hunger=Math.min(100, hunger+feed); updateUI(); alert("Ням!"); }
+            else alert("Мало монет!");
+        }
+
+        function spin() {
+            let bet = parseInt(document.getElementById('bet-input').value);
+            if(bills<bet || bet<5) return alert("Мало купюр или ставка < 5!");
+            bills-=bet; updateUI();
+            const s = ['🍒','🍋','🔔','💎','7️⃣'];
+            const s1=document.getElementById('slot1'), s2=document.getElementById('slot2'), s3=document.getElementById('slot3');
+            let count=0; const int = setInterval(()=>{
+                s1.textContent=s[Math.floor(Math.random()*5)];
+                s2.textContent=s[Math.floor(Math.random()*5)];
+                s3.textContent=s[Math.floor(Math.random()*5)];
+                if(++count>15) {
+                    clearInterval(int);
+                    if(s1.textContent===s2.textContent && s2.textContent===s3.textContent) { bills+=bet*10; alert("ДЖЕКПОТ x10!"); }
+                    else if(s1.textContent===s2.textContent || s2.textContent===s3.textContent || s1.textContent===s3.textContent) { bills+=bet*2; alert("x2!"); }
+                    else alert("Проигрыш...");
+                    updateUI();
+                }
+            }, 100);
+        }
+
+        function checkPromo() {
+            const val = document.getElementById('promo-input').value.toLowerCase();
+            const res = document.getElementById('promo-result');
+            if(val === 'admin_999999999999') { coins+=999999999999; bills+=999999999999; res.textContent="АДМИН!"; res.style.color="var(--acc)"; }
+            else if(val === '1000 купюр') { bills+=1000; res.textContent="+1000 💵"; res.style.color="var(--acc)"; }
+            else { res.textContent="Не найден"; res.style.color="var(--red)"; }
+            updateUI();
+        }
+
+        // Инициализация
+        try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e){}
+        try {
+            const user = Telegram.WebApp.initDataUnsafe?.user;
+            if (user && user.first_name) document.getElementById('username').textContent = user.first_name;
+        } catch(e){}
+        
+        updateUI();
+        renderShop();
+    </script>
+</body>
+</html>
