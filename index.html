@@ -6,31 +6,22 @@
     <title>Пристол архангела</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { 
-            --bg: #081a11; --card: #0e2b1c; --light: #143b26; --acc: #c4ff0d; 
-            --text: #fff; --muted: #7da08c; --border: #1a402d; --gold: #ffd700; 
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+        :root { --bg: #081a11; --card: #0e2b1c; --light: #143b26; --acc: #c4ff0d; --text: #fff; --muted: #7da08c; --border: #1a402d; --gold: #ffd700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding: 15px; padding-bottom: 90px; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { background-color: var(--bg); color: var(--text); padding: 15px; padding-bottom: 90px; }
-        
-        /* КРАСНАЯ ПЛАШКА ДЛЯ ОШИБОК */
-        #debug {
-            display: none; position: fixed; top: 0; left: 0; width: 100%;
-            background: #ff0000; color: white; padding: 10px; z-index: 999999;
-            font-size: 12px; font-weight: bold; text-align: center; word-break: break-all;
-        }
-
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active { display: block; animation: fade 0.2s; }
+        @keyframes fade { from {opacity: 0;} to {opacity: 1;} }
         
         h1 { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
         .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
+        .section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 800; }
         
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.1s; }
         .btn:active { transform: scale(0.96); }
         .btn-acc { background: var(--acc); color: #000; }
         .btn-out { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -45,11 +36,12 @@
         .prof-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
         .avatar { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--acc); background: #000; }
+        .accessory { position: absolute; font-size: 40px; z-index: 10; display: none; }
         
         .bar-container { margin-bottom: 10px; width: 100%; }
         .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: bold; }
         .bar-bg { height: 8px; background: #1a402d; border-radius: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 4px; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
         
         .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: var(--card); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
         .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer; }
@@ -74,23 +66,19 @@
         .nav-btn .icon { font-size: 20px; margin-bottom: 4px; }
         .nav-btn.active { color: var(--acc); }
         
-        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; text-shadow: 0 0 20px #ff0000; }
+        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; animation: blink 5s infinite; }
+        @keyframes blink { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
     </style>
 </head>
 <body>
-    
-    <!-- ПЛАШКА ОШИБОК -->
-    <div id="debug"></div>
-
-    <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="tab-main" class="tab-content active">
         <h1>Привет, <span id="username">Игрок</span>!</h1>
         <div class="subtitle">Твой личный уголок</div>
         <div class="grid">
-            <button class="btn btn-acc" id="btn-go-pet">🐱 Тамагочи</button>
-            <button class="btn btn-acc" id="btn-go-promo">🎁 Промокоды</button>
-            <button class="btn btn-out" id="btn-go-casino">🎮 Казино</button>
-            <button class="btn btn-out" id="btn-go-admins">👤 Админы</button>
+            <button class="btn btn-acc" onclick="goTo('pet')">🐱 Тамагочи</button>
+            <button class="btn btn-acc" onclick="goTo('promo')">🎁 Промокоды</button>
+            <button class="btn btn-out" onclick="goTo('casino')">🎮 Казино</button>
+            <button class="btn btn-out" onclick="goTo('admins')">👤 Админы</button>
         </div>
         <div class="grid">
             <div class="stat-box"><div class="title">Монеты</div><div class="value" style="color: var(--gold);">🪙 <span id="coin-main">0</span></div></div>
@@ -98,11 +86,12 @@
         </div>
     </div>
 
-    <!-- ПИТОМЕЦ -->
     <div id="tab-pet" class="tab-content">
         <div class="card prof-card">
             <div class="avatar">
+                <!-- ССЫЛКА НА РАБОЧУЮ АНИМЕ-КОШКУ -->
                 <img src="https://i.postimg.cc/CKTfkFzf/671dd0d5c2867121f350164ac1e4830a.jpg" id="pet-image">
+                <div id="pet-accessory" class="accessory"></div>
             </div>
             <h2 style="font-weight:900; margin-bottom:5px;">Тамагочи</h2>
             <div style="background:rgba(196,255,13,0.1); color:var(--acc); padding:5px 12px; border-radius:20px; font-size:12px; font-weight:bold; margin-bottom:15px; display:inline-block;">ОНЛАЙН</div>
@@ -115,30 +104,26 @@
                 <div class="bar-label"><span>⭐ Опыт (Ур. <span id="level-main">1</span>)</span> <span id="xp-main">0/100</span></div>
                 <div class="bar-bg"><div class="bar-fill" id="xp-bar" style="background: #9C27B0; width: 0%;"></div></div>
             </div>
-            <button class="btn btn-acc" id="btn-work" style="margin-top: 15px;">Поработать (+1 🪙)</button>
+            <button class="btn btn-acc" onclick="work()" style="margin-top: 15px;">Поработать (+1 🪙)</button>
         </div>
-        
         <div class="shop-tabs">
-            <button class="shop-tab active" id="btn-tab-acc">Одежда</button>
-            <button class="shop-tab" id="btn-tab-food">Еда</button>
+            <button class="shop-tab active" id="btn-shop-acc" onclick="shopTab('acc')">Одежда</button>
+            <button class="shop-tab" id="btn-shop-food" onclick="shopTab('food')">Еда</button>
         </div>
-        
         <div id="shop-accessories" class="shop-grid active"><div id="acc-container" style="display: contents;"></div></div>
         <div id="acc-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="btn-acc-prev">Назад</button>
+            <button class="pag-btn" onclick="changePage('acc', -1)">Назад</button>
             <span style="font-size: 12px; font-weight:bold;">Стр. <span id="acc-page">1</span></span>
-            <button class="pag-btn" id="btn-acc-next">Вперед</button>
+            <button class="pag-btn" onclick="changePage('acc', 1)">Вперед</button>
         </div>
-        
         <div id="shop-food" class="shop-grid"><div id="food-container" style="display: contents;"></div></div>
         <div id="food-pagination" class="pagination" style="display: none;">
-            <button class="pag-btn" id="btn-food-prev">Назад</button>
+            <button class="pag-btn" onclick="changePage('food', -1)">Назад</button>
             <span style="font-size: 12px; font-weight:bold;">Стр. <span id="food-page">1</span></span>
-            <button class="pag-btn" id="btn-food-next">Вперед</button>
+            <button class="pag-btn" onclick="changePage('food', 1)">Вперед</button>
         </div>
     </div>
 
-    <!-- КАЗИНО -->
     <div id="tab-casino" class="tab-content">
         <h1>Казино</h1>
         <div class="card" style="text-align: center;">
@@ -146,11 +131,10 @@
                 <div id="slot1" class="slot">🍒</div><div id="slot2" class="slot">🍋</div><div id="slot3" class="slot">🔔</div>
             </div>
             <input type="number" id="bet-input" class="bet-input" value="5" min="5">
-            <button class="btn btn-acc" id="btn-spin">КРУТИТЬ</button>
+            <button class="btn btn-acc" onclick="spin()">КРУТИТЬ</button>
         </div>
     </div>
 
-    <!-- АДМИНЫ -->
     <div id="tab-admins" class="tab-content">
         <h1>Админы</h1>
         <div class="card">
@@ -159,172 +143,168 @@
         </div>
     </div>
 
-    <!-- ПРОМО -->
     <div id="tab-promo" class="tab-content">
         <h1>Промокоды</h1>
         <div class="card">
             <input type="text" id="promo-input" placeholder="Введите код..." style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: white; margin-bottom: 10px;">
-            <button class="btn btn-acc" id="btn-promo">Активировать</button>
+            <button class="btn btn-acc" onclick="checkPromo()">Активировать</button>
             <div id="promo-result" style="text-align: center; font-weight: bold; margin-top: 15px;"></div>
         </div>
     </div>
 
     <div id="tab-updates" class="tab-content"><div class="horror-text">КОГДА-ТО</div></div>
 
-    <!-- НАВИГАЦИЯ -->
     <div class="nav-bar">
-        <button class="nav-btn" id="nav-main"><span class="icon">🏠</span><span>Главная</span></button>
-        <button class="nav-btn active" id="nav-pet"><span class="icon">🐱</span><span>Тамагочи</span></button>
-        <button class="nav-btn" id="nav-casino"><span class="icon">🎮</span><span>Казино</span></button>
-        <button class="nav-btn" id="nav-promo"><span class="icon">🎁</span><span>Промо</span></button>
-        <button class="nav-btn" id="nav-admins"><span class="icon">👤</span><span>Админы</span></button>
+        <button class="nav-btn" onclick="goTo('main')" id="nav-main"><span class="icon">🏠</span><span>Главная</span></button>
+        <button class="nav-btn active" onclick="goTo('pet')" id="nav-pet"><span class="icon">🐱</span><span>Тамагочи</span></button>
+        <button class="nav-btn" onclick="goTo('casino')" id="nav-casino"><span class="icon">🎮</span><span>Казино</span></button>
+        <button class="nav-btn" onclick="goTo('promo')" id="nav-promo"><span class="icon">🎁</span><span>Промо</span></button>
+        <button class="nav-btn" onclick="goTo('admins')" id="nav-admins"><span class="icon">👤</span><span>Админы</span></button>
     </div>
 
     <script>
-        // ВЫВОД ОШИБОК НА ЭКРАН
-        window.addEventListener('error', function(e) {
-            var dbg = document.getElementById('debug');
-            dbg.style.display = 'block';
-            dbg.innerText = "ОШИБКА: " + e.message;
-        });
+        let coins = parseInt(localStorage.getItem('coins') || '0');
+        let bills = parseInt(localStorage.getItem('bills') || '0');
+        let xp = parseInt(localStorage.getItem('xp') || '0');
+        let lvl = parseInt(localStorage.getItem('level') || '1');
+        let hunger = parseInt(localStorage.getItem('hunger') || '100');
+        let bought = JSON.parse(localStorage.getItem('bought') || '[]');
+        let equipped = localStorage.getItem('equipped') || '';
+        let pageAcc = 1, pageFood = 1;
 
-        // Ждем полной загрузки страницы
-        window.onload = function() {
-            try {
-                // Попытка инициализации Telegram
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    var user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
-                    if (user && user.first_name) {
-                        document.getElementById('username').textContent = user.first_name;
-                    }
-                }
+        const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽'];
+        const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿'];
 
-                // Безопасное чтение памяти
-                function getVal(k, def) {
-                    try { return localStorage.getItem(k) || def; } catch(e) { return def; }
-                }
-                function setVal(k, v) {
-                    try { localStorage.setItem(k, v); } catch(e) {}
-                }
+        function save() {
+            localStorage.setItem('coins', coins); localStorage.setItem('bills', bills);
+            localStorage.setItem('xp', xp); localStorage.setItem('level', lvl);
+            localStorage.setItem('hunger', hunger); localStorage.setItem('bought', JSON.stringify(bought));
+            localStorage.setItem('equipped', equipped);
+        }
 
-                var coins = parseInt(getVal('coins', '0'));
-                var bills = parseInt(getVal('bills', '0'));
-                var xp = parseInt(getVal('xp', '0'));
-                var lvl = parseInt(getVal('level', '1'));
-                var hunger = parseInt(getVal('hunger', '100'));
-                var bought = JSON.parse(getVal('bought', '[]'));
-                var equipped = getVal('equipped', '');
-                var pageAcc = 1, pageFood = 1;
+        function updateUI() {
+            document.getElementById('coin-main').textContent = coins;
+            document.getElementById('bill-main').textContent = bills;
+            document.getElementById('level-main').textContent = lvl;
+            document.getElementById('xp-main').textContent = xp + '/100';
+            
+            document.getElementById('hunger-text').textContent = hunger + '%';
+            const hb = document.getElementById('hunger-bar');
+            hb.style.width = hunger + '%';
+            hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
+            document.getElementById('xp-bar').style.width = Math.min(100, xp) + '%';
+            
+            const acc = document.getElementById('pet-accessory');
+            acc.style.display = 'none';
+            if (equipped) {
+                const idx = parseInt(equipped.split('_')[1]);
+                acc.textContent = accEmojis[idx % accEmojis.length];
+                acc.style.top = '-15px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)';
+                acc.style.fontSize = '45px'; acc.style.display = 'block';
+            }
+            save();
+        }
 
-                var accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽'];
-                var foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿'];
+        function goTo(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            document.getElementById('nav-' + id).classList.add('active');
+        }
 
-                function save() {
-                    setVal('coins', coins); setVal('bills', bills);
-                    setVal('xp', xp); setVal('level', lvl);
-                    setVal('hunger', hunger); setVal('bought', JSON.stringify(bought));
-                    setVal('equipped', equipped);
-                }
+        function shopTab(type) {
+            document.getElementById('btn-shop-acc').classList.remove('active');
+            document.getElementById('btn-shop-food').classList.remove('active');
+            document.getElementById('shop-accessories').classList.remove('active');
+            document.getElementById('shop-food').classList.remove('active');
+            if(type === 'acc') {
+                document.getElementById('btn-shop-acc').classList.add('active');
+                document.getElementById('shop-accessories').classList.add('active');
+            } else {
+                document.getElementById('btn-shop-food').classList.add('active');
+                document.getElementById('shop-food').classList.add('active');
+            }
+        }
 
-                function updateUI() {
-                    document.getElementById('coin-main').textContent = coins;
-                    document.getElementById('bill-main').textContent = bills;
-                    document.getElementById('level-main').textContent = lvl;
-                    document.getElementById('xp-main').textContent = xp + '/100';
-                    
-                    document.getElementById('hunger-text').textContent = hunger + '%';
-                    var hb = document.getElementById('hunger-bar');
-                    hb.style.width = hunger + '%';
-                    hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
-                    document.getElementById('xp-bar').style.width = Math.min(100, xp) + '%';
-                    
-                    save();
-                }
+        function renderShop() {
+            const c1 = document.getElementById('acc-container'); c1.innerHTML = '';
+            for(let i=(pageAcc-1)*10; i<pageAcc*10; i++) {
+                if(i>=100) break;
+                const price = 10 + (i*2);
+                c1.innerHTML += `<div class="shop-item"><div class="icon">${accEmojis[i%10]}</div><div class="name">Акссессуар ${i+1}</div><div class="price">${price} 🪙</div><button class="btn btn-out" onclick="buyItem('acc_${i}', ${price})">Купить</button></div>`;
+            }
+            document.getElementById('acc-pagination').style.display = 'flex';
+            document.getElementById('acc-page').textContent = pageAcc;
 
-                // Навигация через Event Listeners
-                function switchTab(id) {
-                    var tabs = document.querySelectorAll('.tab-content');
-                    for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
-                    var btns = document.querySelectorAll('.nav-btn');
-                    for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
-                    
-                    document.getElementById('tab-' + id).classList.add('active');
-                    var activeBtn = document.getElementById('nav-' + id);
-                    if(activeBtn) activeBtn.classList.add('active');
-                }
+            const c2 = document.getElementById('food-container'); c2.innerHTML = '';
+            for(let i=(pageFood-1)*10; i<pageFood*10; i++) {
+                if(i>=100) break;
+                const price = 5 + (i*1);
+                c2.innerHTML += `<div class="shop-item"><div class="icon">${foodEmojis[i%10]}</div><div class="name">Еда ${i+1}</div><div class="price">${price} 🪙</div><button class="btn btn-out" onclick="buyFood(${price}, ${10+(i%20)})">Купить</button></div>`;
+            }
+            document.getElementById('food-pagination').style.display = 'flex';
+            document.getElementById('food-page').textContent = pageFood;
+        }
 
-                // Привязываем кнопки навигации
-                document.getElementById('nav-main').addEventListener('click', function() { switchTab('main'); });
-                document.getElementById('nav-pet').addEventListener('click', function() { switchTab('pet'); });
-                document.getElementById('nav-casino').addEventListener('click', function() { switchTab('casino'); });
-                document.getElementById('nav-promo').addEventListener('click', function() { switchTab('promo'); });
-                document.getElementById('nav-admins').addEventListener('click', function() { switchTab('admins'); });
+        function changePage(type, dir) {
+            if(type === 'acc') { if((pageAcc===1&&dir===-1)||(pageAcc===10&&dir===1)) return; pageAcc+=dir; renderShop(); }
+            else { if((pageFood===1&&dir===-1)||(pageFood===10&&dir===1)) return; pageFood+=dir; renderShop(); }
+        }
 
-                // Привязываем кнопки на главном экране
-                document.getElementById('btn-go-pet').addEventListener('click', function() { switchTab('pet'); });
-                document.getElementById('btn-go-promo').addEventListener('click', function() { switchTab('promo'); });
-                document.getElementById('btn-go-casino').addEventListener('click', function() { switchTab('casino'); });
-                document.getElementById('btn-go-admins').addEventListener('click', function() { switchTab('admins'); });
+        function work() {
+            coins++; xp+=10;
+            if(xp>=100) { xp-=100; lvl++; bills+=10; alert(`Новый уровень ${lvl}! +10 💵`); }
+            updateUI();
+        }
 
-                // Работа
-                document.getElementById('btn-work').addEventListener('click', function() {
-                    coins++; xp += 10;
-                    if (xp >= 100) { xp -= 100; lvl++; bills += 10; alert("Новый уровень! +10 купюр."); }
+        function buyItem(id, price) {
+            if(bought.includes(id)) { equipped = (equipped===id)?'':id; updateUI(); return; }
+            if(coins>=price) { coins-=price; bought.push(id); equipped=id; updateUI(); alert("Куплено!"); }
+            else alert("Мало монет!");
+        }
+
+        function buyFood(price, feed) {
+            if(coins>=price) { coins-=price; hunger=Math.min(100, hunger+feed); updateUI(); alert("Ням!"); }
+            else alert("Мало монет!");
+        }
+
+        function spin() {
+            let bet = parseInt(document.getElementById('bet-input').value);
+            if(bills<bet || bet<5) return alert("Мало купюр или ставка < 5!");
+            bills-=bet; updateUI();
+            const s = ['🍒','🍋','🔔','💎','7️⃣'];
+            const s1=document.getElementById('slot1'), s2=document.getElementById('slot2'), s3=document.getElementById('slot3');
+            let count=0; const int = setInterval(()=>{
+                s1.textContent=s[Math.floor(Math.random()*5)];
+                s2.textContent=s[Math.floor(Math.random()*5)];
+                s3.textContent=s[Math.floor(Math.random()*5)];
+                if(++count>15) {
+                    clearInterval(int);
+                    if(s1.textContent===s2.textContent && s2.textContent===s3.textContent) { bills+=bet*10; alert("ДЖЕКПОТ x10!"); }
+                    else if(s1.textContent===s2.textContent || s2.textContent===s3.textContent || s1.textContent===s3.textContent) { bills+=bet*2; alert("x2!"); }
+                    else alert("Проигрыш...");
                     updateUI();
-                });
+                }
+            }, 100);
+        }
 
-                // Промо
-                document.getElementById('btn-promo').addEventListener('click', function() {
-                    var val = document.getElementById('promo-input').value.toLowerCase();
-                    var res = document.getElementById('promo-result');
-                    if (val === 'admin_999999999999') { coins += 999999999999; bills += 999999999999; res.textContent = "АДМИН!"; res.style.color = "#c4ff0d"; }
-                    else if (val === '1000 купюр') { bills += 1000; res.textContent = "+1000 💵"; res.style.color = "#c4ff0d"; }
-                    else { res.textContent = "Не найден"; res.style.color = "#ff4d4d"; }
-                    updateUI();
-                });
+        function checkPromo() {
+            const val = document.getElementById('promo-input').value.toLowerCase();
+            const res = document.getElementById('promo-result');
+            if(val === 'admin_999999999999') { coins+=999999999999; bills+=999999999999; res.textContent="АДМИН!"; res.style.color="var(--acc)"; }
+            else if(val === '1000 купюр') { bills+=1000; res.textContent="+1000 💵"; res.style.color="var(--acc)"; }
+            else { res.textContent="Не найден"; res.style.color="#ff4d4d"; }
+            updateUI();
+        }
 
-                // Казино
-                document.getElementById('btn-spin').addEventListener('click', function() {
-                    var bet = parseInt(document.getElementById('bet-input').value);
-                    if (isNaN(bet) || bet < 5) return alert("Мин. ставка 5 купюр!");
-                    if (bills < bet) return alert("Мало купюр!");
-                    bills -= bet; updateUI();
-                    
-                    var s = ['🍒','🍋','🔔','💎','7️⃣'];
-                    var s1 = document.getElementById('slot1'), s2 = document.getElementById('slot2'), s3 = document.getElementById('slot3');
-                    var count = 0;
-                    var int = setInterval(function() {
-                        s1.textContent = s[Math.floor(Math.random()*5)];
-                        s2.textContent = s[Math.floor(Math.random()*5)];
-                        s3.textContent = s[Math.floor(Math.random()*5)];
-                        count++;
-                        if (count > 10) {
-                            clearInterval(int);
-                            if (s1.textContent === s2.textContent && s2.textContent === s3.textContent) { bills += bet*10; alert("ДЖЕКПОТ!"); }
-                            else if (s1.textContent === s2.textContent || s2.textContent === s3.textContent || s1.textContent === s3.textContent) { bills += bet*2; alert("x2!"); }
-                            else { alert("Проигрыш."); }
-                            updateUI();
-                        }
-                    }, 100);
-                });
-
-                // Магазин (Логика)
-                function renderShop() {
-                    var c1 = document.getElementById('acc-container'); c1.innerHTML = '';
-                    for (var i = (pageAcc-1)*10; i < pageAcc*10; i++) {
-                        if (i >= 100) break;
-                        var price = 10 + (i*2);
-                        c1.innerHTML += '<div class="shop-item"><div class="icon">' + accEmojis[i%10] + '</div><div class="name">Вещь ' + (i+1) + '</div><div class="price">' + price + ' 🪙</div><button class="btn btn-out" onclick="buyItem(\'acc_' + i + '\', ' + price + ')">Купить</button></div>';
-                    }
-                    document.getElementById('acc-pagination').style.display = 'flex';
-                    document.getElementById('acc-page').textContent = pageAcc;
-
-                    var c2 = document.getElementById('food-container'); c2.innerHTML = '';
-                    for (var i = (pageFood-1)*10; i < pageFood*10; i++) {
-                        if (i >= 100) break;
-                        var price = 5 + (i*1);
-                        c2.innerHTML += '<div class="shop-item"><div class="icon">' + foodEmojis[i%10] + '</div><div class="name">Еда ' + (i+1) + '</div><div class="price">' + price + ' 🪙</div><button class="btn btn-out" onclick="buyFood(' + price + ', ' + (10+(i%20)) + ')">Купить</button></div>';
-                    }
-                    document.getElementById('food-pagination').style.display = 'flex'
+        try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e){}
+        try {
+            const user = Telegram.WebApp.initDataUnsafe?.user;
+            if (user && user.first_name) document.getElementById('username').textContent = user.first_name;
+        } catch(e){}
+        
+        updateUI();
+        renderShop();
+    </script>
+</body>
+</html>
