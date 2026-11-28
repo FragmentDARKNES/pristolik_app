@@ -7,19 +7,40 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
-        :root { --bg: #081a11; --card: #0e2b1c; --light: #143b26; --acc: #c4ff0d; --text: #fff; --muted: #7da08c; --border: #1a402d; --gold: #ffd700; }
+        
+        :root { 
+            --bg: #081a11; --card: #0e2b1c; --light: #143b26; --acc: #c4ff0d; 
+            --text: #fff; --muted: #7da08c; --border: #1a402d; --gold: #ffd700; 
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding: 15px; padding-bottom: 90px; }
+        
+        body { 
+            background-color: var(--bg); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text); 
+            padding: 15px; 
+            padding-bottom: 90px; 
+            transition: background-image 0.5s ease-in-out;
+        }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fade 0.2s; }
         @keyframes fade { from {opacity: 0;} to {opacity: 1;} }
         
-        h1 { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
-        .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
-        .section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 800; }
+        h1 { font-size: 26px; font-weight: 900; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        .card { 
+            background: rgba(14, 43, 28, 0.9); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            backdrop-filter: blur(5px);
+        }
         
         .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.1s; }
         .btn:active { transform: scale(0.96); }
@@ -29,27 +50,27 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .grid .btn { flex: 1; }
         
-        .stat-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; }
+        .stat-box { background: rgba(14, 43, 28, 0.9); border: 1px solid var(--border); padding: 15px; border-radius: 16px; }
         .stat-box .title { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
         .stat-box .value { font-size: 22px; font-weight: 900; }
         
         .prof-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
         .avatar { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--acc); }
-        .accessory { position: absolute; font-size: 40px; z-index: 10; display: none; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid var(--acc); background: #000; }
+        .accessory { position: absolute; font-size: 40px; z-index: 10; display: none; text-shadow: 0 4px 8px rgba(0,0,0,0.8); }
         
         .bar-container { margin-bottom: 10px; width: 100%; }
         .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: bold; }
         .bar-bg { height: 8px; background: #1a402d; border-radius: 4px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
         
-        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: var(--card); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
+        .shop-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: rgba(14, 43, 28, 0.9); padding: 5px; border-radius: 14px; border: 1px solid var(--border); }
         .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent; color: var(--muted); font-weight: 800; font-size: 13px; cursor: pointer; }
         .shop-tab.active { background: var(--light); color: var(--text); }
         
         .shop-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
         .shop-grid.active { display: grid; }
-        .shop-item { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .shop-item { background: rgba(14, 43, 28, 0.9); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .shop-item .icon { font-size: 30px; margin-bottom: 5px; }
         .shop-item .name { font-size: 12px; font-weight: 600; margin-bottom: 5px; height: 30px; overflow: hidden; }
         .shop-item .price { color: var(--gold); font-weight: 900; margin-bottom: 10px; font-size: 14px; }
@@ -61,16 +82,22 @@
         .slot { font-size: 40px; }
         .bet-input { padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: white; width: 100px; text-align: center; font-size: 18px; margin: 0 auto 15px; display: block; }
         
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(8, 26, 17, 0.95); display: flex; justify-content: space-around; padding: 10px 5px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); z-index: 9999; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(8, 26, 17, 0.95); display: flex; justify-content: space-around; padding: 10px 5px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); z-index: 9999; backdrop-filter: blur(10px); }
         .nav-btn { background: none; border: none; color: var(--muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
         .nav-btn .icon { font-size: 20px; margin-bottom: 4px; }
         .nav-btn.active { color: var(--acc); }
         
-        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; animation: blink 5s infinite; }
+        .horror-text { font-family: 'Impact', sans-serif; font-size: 55px; color: #ff0000; text-align: center; margin-top: 50px; animation: blink 5s infinite; text-shadow: 0 0 20px #ff0000; }
         @keyframes blink { 0%, 4% { opacity: 1; } 5%, 9% { opacity: 0; } 10%, 14% { opacity: 1; } 15%, 100% { opacity: 0; } }
+
+        #video-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background-color: black; opacity: 0; transition: opacity 3s ease-in-out; justify-content: center; align-items: center; pointer-events: none; }
+        #video-container.show { display: flex; opacity: 1; pointer-events: auto; }
+        #video-container video { width: 100%; max-height: 100%; object-fit: contain; }
+        .close-video { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 100000; }
     </style>
 </head>
 <body>
+    
     <div id="tab-main" class="tab-content active">
         <h1>Привет, <span id="username">Игрок</span>!</h1>
         <div class="subtitle">Твой личный уголок</div>
@@ -89,7 +116,7 @@
     <div id="tab-pet" class="tab-content">
         <div class="card prof-card">
             <div class="avatar">
-                <img src="https://i.pinimg.com/736x/8e/7e/85/8e7e85e6b6b2b3b7b8b9b0b1b2b3b4b5.jpg" id="pet-image">
+                <img src="https://i.postimg.cc/CKTfkFzf/671dd0d5c2867121f350164ac1e4830a.jpg" id="pet-image">
                 <div id="pet-accessory" class="accessory"></div>
             </div>
             <h2 style="font-weight:900; margin-bottom:5px;">Тамагочи</h2>
@@ -153,6 +180,13 @@
 
     <div id="tab-updates" class="tab-content"><div class="horror-text">КОГДА-ТО</div></div>
 
+    <div id="video-container">
+        <button class="close-video" onclick="closeVideo()">✕</button>
+        <video id="promo-video" controls autoplay playsinline>
+            <source src="https://yourimageshare.com/ib/DJoBDEI4yP.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <div class="nav-bar">
         <button class="nav-btn" onclick="goTo('main')" id="nav-main"><span class="icon">🏠</span><span>Главная</span></button>
         <button class="nav-btn active" onclick="goTo('pet')" id="nav-pet"><span class="icon">🐱</span><span>Тамагочи</span></button>
@@ -162,10 +196,6 @@
     </div>
 
     <script>
-        // ТЕСТ: Если этот алерт не выскочил, значит Telegram блокирует JS полностью
-        setTimeout(function() { alert("Скрипт Mini App запущен!"); }, 500);
-
-        // Глобальные функции для onclick
         let coins = parseInt(localStorage.getItem('coins') || '0');
         let bills = parseInt(localStorage.getItem('bills') || '0');
         let xp = parseInt(localStorage.getItem('xp') || '0');
@@ -174,18 +204,24 @@
         let bought = JSON.parse(localStorage.getItem('bought') || '[]');
         let equipped = localStorage.getItem('equipped') || '';
         let pageAcc = 1, pageFood = 1;
+        
+        // Ссылки на картинки
+        const defaultCat = "https://i.postimg.cc/CKTfkFzf/671dd0d5c2867121f350164ac1e4830a.jpg"; // Твой черный котик
+        const defaultBg = "none";
+
+        let currentPetImg = localStorage.getItem('currentPetImg') || defaultCat;
+        let currentBg = localStorage.getItem('currentBg') || defaultBg;
 
         const accEmojis = ['🎩', '👑', '🕶️', '🎀', '🧢', '🎓', '👒', '🪖', '👓', '🥽'];
         const foodEmojis = ['🍎', '🍔', '🍰', '🍕', '🍣', '🍜', '🍩', '🍪', '🍫', '🍿'];
 
         function save() {
-            localStorage.setItem('coins', coins);
-            localStorage.setItem('bills', bills);
-            localStorage.setItem('xp', xp);
-            localStorage.setItem('level', lvl);
-            localStorage.setItem('hunger', hunger);
-            localStorage.setItem('bought', JSON.stringify(bought));
+            localStorage.setItem('coins', coins); localStorage.setItem('bills', bills);
+            localStorage.setItem('xp', xp); localStorage.setItem('level', lvl);
+            localStorage.setItem('hunger', hunger); localStorage.setItem('bought', JSON.stringify(bought));
             localStorage.setItem('equipped', equipped);
+            localStorage.setItem('currentPetImg', currentPetImg);
+            localStorage.setItem('currentBg', currentBg);
         }
 
         function updateUI() {
@@ -198,17 +234,23 @@
             const hb = document.getElementById('hunger-bar');
             hb.style.width = hunger + '%';
             hb.style.backgroundColor = hunger > 70 ? '#c4ff0d' : (hunger > 30 ? '#ffd700' : '#ff4d4d');
-            
             document.getElementById('xp-bar').style.width = Math.min(100, xp) + '%';
             
+            // Применяем фон и аватарку
+            if(currentBg !== "none") {
+                document.body.style.backgroundImage = `url('${currentBg}')`;
+            } else {
+                document.body.style.backgroundImage = "none";
+            }
+            document.getElementById('pet-image').src = currentPetImg;
+
             const acc = document.getElementById('pet-accessory');
             acc.style.display = 'none';
             if (equipped) {
                 const idx = parseInt(equipped.split('_')[1]);
                 acc.textContent = accEmojis[idx % accEmojis.length];
                 acc.style.top = '-15px'; acc.style.left = '50%'; acc.style.transform = 'translateX(-50%)';
-                acc.style.fontSize = '45px';
-                acc.style.display = 'block';
+                acc.style.fontSize = '45px'; acc.style.display = 'block';
             }
             save();
         }
@@ -286,34 +328,4 @@
                 s1.textContent=s[Math.floor(Math.random()*5)];
                 s2.textContent=s[Math.floor(Math.random()*5)];
                 s3.textContent=s[Math.floor(Math.random()*5)];
-                if(++count>15) {
-                    clearInterval(int);
-                    if(s1.textContent===s2.textContent && s2.textContent===s3.textContent) { bills+=bet*10; alert("ДЖЕКПОТ x10!"); }
-                    else if(s1.textContent===s2.textContent || s2.textContent===s3.textContent || s1.textContent===s3.textContent) { bills+=bet*2; alert("x2!"); }
-                    else alert("Проигрыш...");
-                    updateUI();
-                }
-            }, 100);
-        }
-
-        function checkPromo() {
-            const val = document.getElementById('promo-input').value.toLowerCase();
-            const res = document.getElementById('promo-result');
-            if(val === 'admin_999999999999') { coins+=999999999999; bills+=999999999999; res.textContent="АДМИН!"; res.style.color="var(--acc)"; }
-            else if(val === '1000 купюр') { bills+=1000; res.textContent="+1000 💵"; res.style.color="var(--acc)"; }
-            else { res.textContent="Не найден"; res.style.color="var(--red)"; }
-            updateUI();
-        }
-
-        // Инициализация
-        try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e){}
-        try {
-            const user = Telegram.WebApp.initDataUnsafe?.user;
-            if (user && user.first_name) document.getElementById('username').textContent = user.first_name;
-        } catch(e){}
-        
-        updateUI();
-        renderShop();
-    </script>
-</body>
-</html>
+                if(++cou
